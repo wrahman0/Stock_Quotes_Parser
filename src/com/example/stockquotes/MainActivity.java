@@ -4,11 +4,15 @@ import java.util.Arrays;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
@@ -87,9 +91,30 @@ public class MainActivity extends Activity {
 	
 	private void insertStockInScrollView (String stock, int arrayIndex){
 		
+		//Get layoutInflator
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
 		
+		//Use the inflater to inflate a stockrow
+		View newStockRow = inflater.inflate(R.layout.stock_quote_row, null);
+		
+		//Make Text View
+		TextView newStockTextView = (TextView) newStockRow.findViewById(R.id.stockSymbolTextView);
+		
+		//Add the stockSymbol to the textview
+		newStockTextView.setText(stock);
+		
+		Button stockQuoteButton = (Button) newStockRow.findViewById(R.id.stockQuoteButton);
+		stockQuoteButton.setOnClickListener(getStockActivityListener);
+		
+		Button quoteFromWebButton = (Button) newStockRow.findViewById (R.id.quoteFromWebButton);
+		quoteFromWebButton.setOnClickListener(getStockFromWebsiteListener);
+		
+		//Add the new component in the tablelayout
+		stockTableScrollView.addView(newStockRow, arrayIndex);
 		
 	}
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
