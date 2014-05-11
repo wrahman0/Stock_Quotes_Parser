@@ -5,6 +5,8 @@ import java.util.Arrays;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -114,7 +116,17 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	
+	public OnClickListener enterStockButtonListener = new OnClickListener () {
+
+		//TODO: CONTINUE FROM HERE
+		
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	};
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
