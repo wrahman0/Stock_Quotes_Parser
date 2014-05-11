@@ -2,12 +2,15 @@ package com.example.stockquotes;
 
 import java.util.Arrays;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -79,6 +83,7 @@ public class MainActivity extends Activity {
 		
 	}
 	
+	@SuppressLint("NewApi")
 	private void saveStockSymbol(String newStock){
 		
 		//Check if new stock
@@ -161,23 +166,71 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	public OnClickListener deleteStocksButtonListener = new OnClickListener (){
+	 public OnClickListener deleteStocksButtonListener = new OnClickListener(){
 
-		@Override
+		@SuppressLint("NewApi")
 		public void onClick(View v) {
 			
+			deleteAllStocks();
+			SharedPreferences.Editor preferencesEditor = stockSymbolsEntered.edit();
+			
+			preferencesEditor.clear();
+			preferencesEditor.apply();
 			
 			
 		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			// TODO Auto-generated method stub
+			
+		};
+
 		
 	};
 	
 	public OnClickListener getStockFromWebsiteListener = new OnClickListener (){
 
+		public void onClick(View v) {
+		
+			TableRow tableRow = (TableRow) v.getParent(); 
+			TextView stockTextView = (TextView) tableRow.findViewById(R.id.stockSymbolTextView);
+			String stockSymbol = stockTextView.getText().toString();
+			
+			//Make the URL for the corresponding stock symbol
+			String stockURL = getString (R.string.yahoo_stock_url) + stockSymbol;
+			
+			Intent getStockWebPage = new Intent (Intent.ACTION_VIEW,Uri.parse(stockURL));
+			
+			startActivity (getStockWebPage);
+			
+		}
+
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-		
+			// TODO Auto-generated method stub
 			
+		}
+		
+	};
+	
+	public OnClickListener getStockActivityListener = new OnClickListener (){
+		
+		public void onClick (View v){
+		
+			TableRow tableRow = (TableRow) v.getParent();
+			TextView stockTextView = (TextView) tableRow.findViewById(R.id.stockSymbolTextView);
+			String stockSymbol = stockTextView.getText().toString();
+			Intent intent = new Intent (MainActivity.this, StockInfoActivity.class);
+			intent.putExtra(STOCK_SYMBOL, stockSymbol);
+			startActivity(intent);
+			
+			
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			// TODO Auto-generated method stub
 			
 		}
 		
