@@ -53,9 +53,41 @@ public class MainActivity extends Activity {
 		Arrays.sort(stocks, String.CASE_INSENSITIVE_ORDER);
 		
 		//update
-		if (symbolToAdd == null){
+		if (symbolToAdd != null){
+			
+			// Enter the new stock in sorted order into the array
+			insertStockInScrollView (newStockSymbol, Arrays.binarySearch(stocks, newStockSymbol));
+			
+		}else{
+			
+			// Display saved stocks list
+			for (int i = 0; i < stocks.length; i++){
+				
+				insertStockInScrollView(stocks[i], i);
+				
+			}
 			
 		}
+		
+	}
+	
+	private void saveStockSymbol(String newStock){
+		
+		//Check if new stock
+		String isTheStockNew = stockSymbolsEntered.getString(newStock, null);
+		SharedPreferences.Editor preferencesEditor = stockSymbolsEntered.edit();
+		preferencesEditor.putString(newStock, newStock);
+		preferencesEditor.apply();
+		
+		if (isTheStockNew == null){
+			updateSavedStockList(newStock);
+		}
+		
+	}
+	
+	private void insertStockInScrollView (String stock, int arrayIndex){
+		
+		
 		
 	}
 
