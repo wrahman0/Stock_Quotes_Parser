@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -117,12 +119,65 @@ public class MainActivity extends Activity {
 	}
 	
 	public OnClickListener enterStockButtonListener = new OnClickListener () {
-
-		//TODO: CONTINUE FROM HERE
 		
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			// TODO Auto-generated method stub
+			
+			//Check if the stock symbol is provided
+			if (stockSymbolEditText.getText().length() > 0){
+				
+				saveStockSymbol (stockSymbolEditText.getText().toString());
+				stockSymbolEditText.setText("");
+				//Force keyboard to close:
+				InputMethodManager imm = (InputMethodManager) getSystemService (Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(stockSymbolEditText.getWindowToken(), 0);
+				
+			}else{
+				
+				//If the editText is empty show alert dialog box
+				
+				//Create the dialog box
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				
+				//Set Alert Title
+				builder.setTitle(R.string.invalid_stock_symbol);
+				
+				//Set value of positive reaction from user
+				builder.setPositiveButton(R.string.ok, null);
+				builder.setMessage(R.string.missing_stock_symbol);
+				AlertDialog theAlertDialog = builder.create();
+				theAlertDialog.show();
+				
+			}
+			
+		}
+		
+	};
+	
+	public void deleteAllStocks() {
+		
+		//delete from table layout
+		stockTableScrollView.removeAllViews();
+		
+	}
+	
+	public OnClickListener deleteStocksButtonListener = new OnClickListener (){
+
+		@Override
+		public void onClick(View v) {
+			
+			
+			
+		}
+		
+	};
+	
+	public OnClickListener getStockFromWebsiteListener = new OnClickListener (){
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+		
+			
 			
 		}
 		
