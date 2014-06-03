@@ -1,14 +1,32 @@
 package com.example.stockquotes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.DocumentsContract.Document;
+import android.util.Log;
 import android.widget.TextView;
 
 public class StockInfoActivity extends Activity {
-	
+
 	private static final String TAG = "STOCKQUOTE";
-	
+
 	TextView companyNameTextView;
 	TextView yearLowTextView;
 	TextView yearHighTextView;
@@ -17,7 +35,7 @@ public class StockInfoActivity extends Activity {
 	TextView lastTradePriceOnlyTextView;
 	TextView changeTextView;
 	TextView daysRangeTextView;
-	
+
 	//Parent node for the xml file
 	static final String KEY_ITEM = "quote";
 
@@ -30,7 +48,7 @@ public class StockInfoActivity extends Activity {
 	static final String KEY_LAST_TRADE_PRICE_ONLY = "LastTradePriceOnly";
 	static final String KEY_ITEM_CHANGE_TEXT = "ChangeText";
 	static final String KEY_ITEM_DAYS_RANGE = "DaysRange";
-	
+
 	//Information to get
 	String name = "";
 	String yearLow = "";
@@ -40,20 +58,20 @@ public class StockInfoActivity extends Activity {
 	String lastTradePriceOnly = "";
 	String change = "";
 	String daysRange = "";
-	
+
 	String yahooURLFirst = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22";
 	String yahooURLSecond = "%22)&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
-	
+
 	protected void OnCreate (Bundle savedInstanceState){
-		
+
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView (R.layout.activity_stock_info);
-		
+
 		//Getting the passed info from other activity
 		Intent intent = getIntent();
 		String stockSymbol = intent.getStringExtra(MainActivity.STOCK_SYMBOL);
-		
+
 		// Initialize TextViews
 		companyNameTextView = (TextView) findViewById(R.id.companyNameTextView);
 		yearLowTextView = (TextView) findViewById(R.id.yearLowTextView);
@@ -63,10 +81,69 @@ public class StockInfoActivity extends Activity {
 		lastTradePriceOnlyTextView = (TextView) findViewById(R.id.lastTradePriceOnlyTextView);
 		changeTextView = (TextView) findViewById(R.id.changeTextView);
 		daysRangeTextView = (TextView) findViewById(R.id.daysRangeTextView);
-		
+
 		final String yqlURL = yahooURLFirst + stockSymbol + yahooURLSecond;
-		
-		
+
+		new MyAsyncTask().execute();
+
 	}
-	
+
+	private class MyAsyncTask extends AsyncTask <String, String, String>{
+
+		protected String doInBackground(String... args) {
+
+			try {
+
+				URL url = new URL (args[0]);
+				URLConnection connection;
+				connection = url.openConnection();
+
+				HttpURLConnection httpConnection = (HttpURLConnection) connection;
+
+				int responseCode = httpConnection.getResponseCode();
+
+				if (responseCode == HttpURLConnection.HTTP_OK){
+					InputStream in = httpConnection.getInputStream();
+					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+					DocumentBuilder db = dbf.newDocumentBuilder();
+					org.w3c.dom.Document dom = db.parse(in);
+					Element docEle = dom.getDocumentElement();
+					NodeList nl = docEle.getElementsByTagName("quote");
+
+					if (nl != null && nl.getLength() > 0){
+						for (int i = 0 ; i < nl.getLength(); i++){
+							StockInfo theStock = getStockInformation (docEle);
+
+							// Gets the values stored in the StockInfo object
+							daysLow = theStock.getDaysLow();
+							daysHigh = theStock.getDaysHigh();
+							yearLow = theStock.getYearLow();
+							yearHigh = theStock.getYearHigh();
+							name = theStock.getName();
+							lastTradePriceOnly = theStock.getLastTradePriceOnly();
+							change = theStock.getChange();
+							daysRange = theStock.getDaysRange();
+
+						}
+					}
+				}
+			}catch (MalformedURLException e) {
+				Log.d(TAG, "MalformedURLException", e);
+			} catch (IOException e) {
+				Log.d(TAG, "IOException", e);
+			} catch (ParserConfigurationException e) {
+				Log.d(TAG, "Parser Configuration Exception", e);
+			} catch (SAXException e) {
+				Log.d(TAG, "SAX Exception", e);
+			}
+
+			finally {} 
+
+			return null;
+		}
+		
+		
+
+	}
+
 }
