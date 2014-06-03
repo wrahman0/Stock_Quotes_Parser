@@ -8,13 +8,12 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,24 +47,24 @@ public class MainActivity extends Activity {
 		deleteStocksButton = (Button) findViewById (R.id.deleteStocksButton);
 		
 		//Click Listeners to the buttons
-		enterStockSymbolButton.setOnClickListener(enterStockButtonListener);
-		deleteStocksButton.setOnClickListener(deleteStocksButtonListener);
+		//Shady solution
+		enterStockSymbolButton.setOnClickListener((android.view.View.OnClickListener) enterStockButtonListener);
+		deleteStocksButton.setOnClickListener((android.view.View.OnClickListener) deleteStocksButtonListener);
 		
 		//Add saved stocks to the ScrollView
 		updateSavedStockList(null);
 		
-		
 	}
 	
 	//Add new stock or update with saved stocks if null is passed through
-	private void updateSavedStockList(String symbolToAdd){
+	private void updateSavedStockList(String newStockSymbol){
 		
 		//Get the saved stocks
 		String[] stocks = stockSymbolsEntered.getAll().keySet().toArray(new String[0]);
 		Arrays.sort(stocks, String.CASE_INSENSITIVE_ORDER);
 		
 		//update
-		if (symbolToAdd != null){
+		if (newStockSymbol != null){
 			
 			// Enter the new stock in sorted order into the array
 			insertStockInScrollView (newStockSymbol, Arrays.binarySearch(stocks, newStockSymbol));
@@ -113,10 +112,10 @@ public class MainActivity extends Activity {
 		newStockTextView.setText(stock);
 		
 		Button stockQuoteButton = (Button) newStockRow.findViewById(R.id.stockQuoteButton);
-		stockQuoteButton.setOnClickListener(getStockActivityListener);
+		stockQuoteButton.setOnClickListener((android.view.View.OnClickListener) getStockActivityListener);
 		
 		Button quoteFromWebButton = (Button) newStockRow.findViewById (R.id.quoteFromWebButton);
-		quoteFromWebButton.setOnClickListener(getStockFromWebsiteListener);
+		quoteFromWebButton.setOnClickListener((android.view.View.OnClickListener) getStockFromWebsiteListener);
 		
 		//Add the new component in the tablelayout
 		stockTableScrollView.addView(newStockRow, arrayIndex);
@@ -126,7 +125,7 @@ public class MainActivity extends Activity {
 	public OnClickListener enterStockButtonListener = new OnClickListener () {
 		
 		@Override
-		public void onClick(DialogInterface dialog, int which) {
+		public void onClick(View v) {
 			
 			//Check if the stock symbol is provided
 			if (stockSymbolEditText.getText().length() > 0){
@@ -167,8 +166,9 @@ public class MainActivity extends Activity {
 	}
 	
 	 public OnClickListener deleteStocksButtonListener = new OnClickListener(){
-
-		@SuppressLint("NewApi")
+		 
+		 @SuppressLint("NewApi")
+		@Override
 		public void onClick(View v) {
 			
 			deleteAllStocks();
@@ -179,18 +179,11 @@ public class MainActivity extends Activity {
 			
 			
 		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			// TODO Auto-generated method stub
-			
-		};
-
 		
 	};
 	
-	public OnClickListener getStockFromWebsiteListener = new OnClickListener (){
-
+	public OnClickListener getStockFromWebsiteListener = new OnClickListener(){
+		
 		public void onClick(View v) {
 		
 			TableRow tableRow = (TableRow) v.getParent(); 
@@ -199,16 +192,8 @@ public class MainActivity extends Activity {
 			
 			//Make the URL for the corresponding stock symbol
 			String stockURL = getString (R.string.yahoo_stock_url) + stockSymbol;
-			
 			Intent getStockWebPage = new Intent (Intent.ACTION_VIEW,Uri.parse(stockURL));
-			
 			startActivity (getStockWebPage);
-			
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			// TODO Auto-generated method stub
 			
 		}
 		
@@ -216,6 +201,7 @@ public class MainActivity extends Activity {
 	
 	public OnClickListener getStockActivityListener = new OnClickListener (){
 		
+		@Override
 		public void onClick (View v){
 		
 			TableRow tableRow = (TableRow) v.getParent();
@@ -224,13 +210,6 @@ public class MainActivity extends Activity {
 			Intent intent = new Intent (MainActivity.this, StockInfoActivity.class);
 			intent.putExtra(STOCK_SYMBOL, stockSymbol);
 			startActivity(intent);
-			
-			
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			// TODO Auto-generated method stub
 			
 		}
 		
