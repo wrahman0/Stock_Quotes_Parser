@@ -142,7 +142,9 @@ public class StockInfoActivity extends Activity {
 			return null;
 		}
 		
-		
+		private StockInfo getStockInformation (Element entry){
+			
+		}
 
 	}
 
